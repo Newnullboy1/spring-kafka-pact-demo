@@ -1,0 +1,61 @@
+version: "3.9"
+services:
+  kafka:
+    image: bitnami/kafka:3.7
+    container_name: kafka
+    environment:
+      - KAFKA_ENABLE_KRAFT=yes
+      - KAFKA_CFG_NODE_ID=1
+      - KAFKA_CFG_PROCESS_ROLES=broker,controller
+      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://localhost:9092
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=1@kafka:9093
+      - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=true
+    ports:
+      - "9092:9092"
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: kafka-ui
+    ports:
+      - "8081:8080"
+    environment:
+      - KAFKA_CLUSTERS_0_NAME=local
+      - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka:9092
+    depends_on:
+      - kafka
+
+  pact-postgres:
+    image: postgres:14
+    container_name: pact-postgres
+    environment:
+      - POSTGRES_USER=pactbroker
+      - POSTGRES_PASSWORD=pactbroker
+      - POSTGRES_DB=pactbroker
+    volumes:
+      - pact-pgdata:/var/lib/postgresql/data
+
+  pact-broker:
+    image: pactfoundation/pact-broker:latest
+    container_name: pact-broker
+    ports:
+      - "9292:9292"
+    environment:
+      - PACT_BROKER_DATABASE_URL=postgres://pactbroker:pactbroker@pact-postgres:5432/pactbroker
+      - PACT_BROKER_LOG_LEVEL=INFO
+      - PACT_BROKER_ALLOW_PUBLIC_READ=false
+      - PACT_BROKER_BASIC_AUTH_USERNAME=brokerUser
+      - PACT_BROKER_BASIC_AUTH_PASSWORD=brokerPass
+    depends_on:
+      - pact-postgres
+
+  pact-cli:
+    image: pactfoundation/pact-cli:latest
+    container_name: pact-cli
+    # no ports needed; it talks to pact-broker over the internal Docker network
+    depends_on:
+      - pact-broker
+
+volumes:
+  pact-pgdata:

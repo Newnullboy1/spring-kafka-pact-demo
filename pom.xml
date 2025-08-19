@@ -1,0 +1,109 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.example</groupId>
+  <artifactId>spring-kafka-pact-demo</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <packaging>pom</packaging>
+  <modules>
+    <module>consumer-service</module>
+    <module>producer-service</module>
+  </modules>
+
+  <parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>3.5.4</version>
+    <relativePath/>
+  </parent>
+
+  <properties>
+    <java.version>17</java.version>
+    <maven.compiler.source>17</maven.compiler.source>
+    <maven.compiler.target>17</maven.compiler.target>
+    <spring.boot.version>3.5.4</spring.boot.version>
+    <pact.version>4.6.15</pact.version>
+  </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-dependencies</artifactId>
+        <version>${spring.boot.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <!-- Centralize Jackson version -->
+      <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-databind</artifactId>
+        <version>2.17.2</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-maven-plugin</artifactId>
+          <version>${spring.boot.version}</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+
+    <plugins>
+      <plugin>
+        <groupId>pl.project13.maven</groupId>
+        <artifactId>git-commit-id-plugin</artifactId>
+        <version>4.9.10</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>revision</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <failOnNoGitDirectory>false</failOnNoGitDirectory>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>au.com.dius.pact.provider</groupId>
+        <artifactId>maven</artifactId>
+        <version>${pact.version}</version>
+        <configuration>
+          <!-- for pact consumer-->
+          <pactBrokerUrl>${pact.broker.url}</pactBrokerUrl>
+          <pactBrokerUsername>${pact.broker.username}</pactBrokerUsername>
+          <pactBrokerPassword>${pact.broker.password}</pactBrokerPassword>
+          <projectVersion>${pact.test.version}</projectVersion>
+          <trimSnapshot>true</trimSnapshot>
+
+          <!-- for pact provider-->
+<!--          <serviceProviders>-->
+<!--            <serviceProvider>-->
+<!--              <name>${pact.provider.name}</name>-->
+<!--&lt;!&ndash;              <host>${pact.provider.host}</host>&ndash;&gt;-->
+<!--&lt;!&ndash;              <port>${pact.provider.port}</port>&ndash;&gt;-->
+<!--              <verificationType>ANNOTATED_METHOD</verificationType>-->
+<!--              <packagesToScan>-->
+<!--                <packageToScan>com.example.producer.pact</packageToScan>-->
+<!--              </packagesToScan>-->
+<!--              <pactBroker>-->
+<!--                <url>${pact.broker.url}</url>-->
+<!--                <authentication>-->
+<!--                  <username>${pact.broker.username}</username>-->
+<!--                  <password>${pact.broker.password}</password>-->
+<!--                </authentication>-->
+<!--              </pactBroker>-->
+<!--            </serviceProvider>-->
+<!--          </serviceProviders>-->
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>
