@@ -1,0 +1,36 @@
+name: Auto Tag on Merge to Main
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  tag-on-merge:
+    runs-on: ubuntu-latest
+    if: github.event.head_commit.message != ''
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check if commit is a merge
+        id: check_merge
+        run: |
+          if [[ $(git log -1 --pretty=%B) == *"Merge pull request"* ]]; then
+            echo "is_merge=true" >> $GITHUB_OUTPUT
+          else
+            echo "is_merge=false" >> $GITHUB_OUTPUT
+
+      - name: Create tag if merge
+        if: steps.check_merge.outputs.is_merge == 'true'
+        run: |
+          TAG_NAME="v$(date +'%Y%m%d-%H%M%S')"
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git tag $TAG_NAME
+          git push origin $TAG_NAME
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
