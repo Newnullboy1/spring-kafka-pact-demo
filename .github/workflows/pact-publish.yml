@@ -1,4 +1,4 @@
-name: Publish Pact to Broker
+name: Publish Pact to Brokers
 
 on:
   workflow_dispatch:
