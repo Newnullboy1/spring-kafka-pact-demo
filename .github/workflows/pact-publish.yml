@@ -7,17 +7,6 @@ on:
         description: 'Pact Broker URL'
         required: true
         type: string
-      PACT_BROKER_USERNAME:
-        description: 'Pact Broker Username'
-        required: true
-        type: string
-      PACT_BROKER_PASSWORD:
-        description: 'Pact Broker Password'
-        required: true
-        type: string
-  push:
-    branches:
-      - 'feature/add-publish-pact-workflow'
 
 jobs:
   publish-pact:
@@ -28,6 +17,22 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Get Pact Broker credentials from AWS Secrets Manager
+        id: get_pact_secrets
+        run: |
+          secret=$(aws secretsmanager get-secret-value --secret-id app-pact --query 'SecretString' --output text)
+          PACT_BROKER_USERNAME=$(echo "$secret" | jq -r .PACT_BROKER_USERNAME)
+          PACT_BROKER_PASSWORD=$(echo "$secret" | jq -r .PACT_BROKER_PASSWORD)
+          echo "PACT_BROKER_USERNAME=$PACT_BROKER_USERNAME" >> $GITHUB_ENV
+          echo "PACT_BROKER_PASSWORD=$PACT_BROKER_PASSWORD" >> $GITHUB_ENV
 
       - name: Set up JDK 17
         uses: actions/setup-java@v3
@@ -48,8 +53,8 @@ jobs:
         run: |
           mvn \
             -Dpact.broker.url=${{ inputs.PACT_BROKER_URL }} \
-            -Dpact.broker.username=${{ inputs.PACT_BROKER_USERNAME }} \
-            -Dpact.broker.password=${{ inputs.PACT_BROKER_PASSWORD }} \
+            -Dpact.broker.username=${{ env.PACT_BROKER_USERNAME }} \
+            -Dpact.broker.password=${{ env.PACT_BROKER_PASSWORD }} \
             -Dpact.test.version=${{ env.TAG }} \
             -Dpact.publish.consumer.branchName=${{ github.ref_name }} \
             -Dpact.consumer.tags=tag-001 \
