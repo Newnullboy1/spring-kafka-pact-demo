@@ -1,0 +1,16 @@
+name: Print HelloWorld Reusable
+
+on:
+  workflow_call:
+    inputs:
+      custom:
+        required: true
+        type: string
+
+jobs:
+  hello:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print HelloWorld
+        run: echo "HelloWorld-${{ inputs.custom }}"
+

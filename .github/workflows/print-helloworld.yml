@@ -9,8 +9,7 @@ on:
         default: 'test'
 
 jobs:
-  hello:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Print HelloWorld
-        run: echo "HelloWorld-${{ github.event.inputs.custom }}"
+  call-helloworld-reusable:
+    uses: ./.github/workflows/print-helloworld-reusable.yml
+    with:
+      custom: ${{ github.event.inputs.custom }}
