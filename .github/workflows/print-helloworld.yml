@@ -2,10 +2,15 @@ name: Print HelloWorld
 
 on:
   workflow_dispatch:
+    inputs:
+      custom:
+        description: 'Custom text to append after HelloWorld'
+        required: true
+        default: 'test'
 
 jobs:
   hello:
     runs-on: ubuntu-latest
     steps:
       - name: Print HelloWorld
-        run: echo "HelloWorld-test"
+        run: echo "HelloWorld-${{ github.event.inputs.custom }}"
