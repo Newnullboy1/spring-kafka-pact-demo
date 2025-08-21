@@ -22,6 +22,7 @@ jobs:
             echo "is_merge=true" >> $GITHUB_OUTPUT
           else
             echo "is_merge=false" >> $GITHUB_OUTPUT
+          fi
 
       - name: Create tag if merge
         if: steps.check_merge.outputs.is_merge == 'true'
@@ -33,4 +34,3 @@ jobs:
           git push origin $TAG_NAME
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
