@@ -15,9 +15,6 @@ on:
         description: 'Pact Broker Password'
         required: true
         type: string
-  push:
-    branches:
-      - 'feature/add-publish-pact-workflow'
 
 jobs:
   publish-pact:
