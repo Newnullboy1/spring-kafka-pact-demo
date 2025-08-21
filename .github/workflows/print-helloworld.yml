@@ -8,4 +8,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Print HelloWorld
-        run: echo "HelloWorld-main"
+        run: echo "HelloWorld-test"
