@@ -7,6 +7,10 @@ on:
         description: 'Pact Broker URL'
         required: true
         type: string
+      PACT_BROKER_SECRET_ARN:
+        description: 'AWS Secrets Manager Secret ARN for Pact Broker credentials'
+        required: true
+        type: string
 
 jobs:
   publish-pact:
@@ -28,7 +32,7 @@ jobs:
       - name: Get Pact Broker credentials from AWS Secrets Manager
         id: get_pact_secrets
         run: |
-          secret=$(aws secretsmanager get-secret-value --secret-id app-pact --query 'SecretString' --output text)
+          secret=$(aws secretsmanager get-secret-value --secret-id ${{ inputs.PACT_BROKER_SECRET_ARN }} --query 'SecretString' --output text)
           PACT_BROKER_USERNAME=$(echo "$secret" | jq -r .PACT_BROKER_USERNAME)
           PACT_BROKER_PASSWORD=$(echo "$secret" | jq -r .PACT_BROKER_PASSWORD)
           echo "PACT_BROKER_USERNAME=$PACT_BROKER_USERNAME" >> $GITHUB_ENV
