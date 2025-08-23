@@ -27,6 +27,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          role-to-assume: ${{ secrets.ASSUME_ROLE_ARN }}
           aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Get Pact Broker credentials from AWS Secrets Manager
